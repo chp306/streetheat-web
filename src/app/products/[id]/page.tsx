@@ -58,7 +58,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
                   {product.variants.map((v) => (
                     <div key={v.id} className="border border-zinc-700 px-3 py-2 text-xs text-zinc-300 flex flex-col items-center gap-1">
                       <span>UK {v.size}</span>
-                      <span className="font-bold" style={{ color: "#F5A623" }}>£{Number(v.price).toFixed(2)}</span>
+                      <span className="font-bold" style={{ color: "#F5A623" }}>£{Number(product.basePrice).toFixed(2)}</span>
                       {v.stockQuantity === 0 && <span className="text-zinc-600">Sold</span>}
                     </div>
                   ))}
@@ -73,7 +73,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
                 variants: product.variants.map((v) => ({
                   id: v.id,
                   size: v.size,
-                  price: Number(v.price),
+                  price: Number(product.basePrice),
                   stockQuantity: v.stockQuantity,
                   productId: v.productId,
                   sku: v.sku,
