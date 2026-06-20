@@ -47,7 +47,7 @@ export default async function ProductsPage() {
                     <p className="text-white text-sm font-medium mb-2 leading-tight">{product.name}</p>
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-bold" style={{ color: "#F5A623" }}>
-                        £{Number(product.variants[0]?.price ?? product.basePrice).toFixed(2)}
+                        £{Number(product.basePrice).toFixed(2)}
                       </p>
                       {product.offerEnabled && (
                         <span className="text-xs uppercase tracking-widest" style={{ color: "#D9483B" }}>Offers</span>
