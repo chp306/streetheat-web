@@ -11,7 +11,7 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
       brand: true,
       category: true,
       images: { orderBy: { displayOrder: "asc" } },
-      variants: true,
+      variants: { select: { id: true, size: true, price: true, stockQuantity: true, sku: true, productId: true } },
     },
   });
 
