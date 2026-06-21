@@ -4,8 +4,9 @@ import { verifyToken } from "@/lib/jwt";
 
 export const dynamic = "force-dynamic";
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const token = req.cookies.get("access_token")?.value;
     if (!token) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
@@ -18,12 +19,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
-    const offer = await prisma.offer.findUnique({ where: { id: params.id } });
+    const offer = await prisma.offer.findUnique({ where: { id } });
     if (!offer) return NextResponse.json({ error: "Offer not found" }, { status: 404 });
     if (offer.status !== "pending") return NextResponse.json({ error: "Offer already resolved" }, { status: 400 });
 
     const updated = await prisma.offer.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: action === "accept" ? "accepted" : action === "counter" ? "countered" : "rejected",
         counterPrice: action === "counter" ? Number(counterPrice) : undefined,
