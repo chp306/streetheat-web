@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const { user, clearAuth } = useAuthStore();
-  const count = useCartStore((s) => s.count());
+  const count = useCartStore((s) => s.totalItems());
   const router = useRouter();
 
   const handleLogout = () => {
