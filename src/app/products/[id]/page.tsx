@@ -5,9 +5,10 @@ import OfferButton from "@/components/product/OfferButton";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductDetailPage({ params }: { params: { id: string } }) {
+export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const product = await prisma.product.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       brand: true,
       category: true,
