@@ -1,5 +1,16 @@
 import Stripe from 'stripe'
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-05-27.dahlia',
+let stripeInstance: Stripe | null = null
+
+export function getStripe(): Stripe {
+      apiVersion: '2026-05-27.dahlia',
+    })
+  }
+  return stripeInstance
+}
+
+export const stripe = new Proxy({} as Stripe, {
+  get(_, prop) {
+    return getStripe()[prop as keyof Stripe]
+  }
 })
