@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: session.url })
   } catch (err) {
-    console.error(err)
+    console.error("CHECKOUT ERROR:", JSON.stringify(err, Object.getOwnPropertyNames(err)))
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
