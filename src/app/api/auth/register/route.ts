@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
     const accessToken = signAccessToken({ userId: user.id, role: user.role });
     const refreshToken = signRefreshToken({ userId: user.id, role: user.role });
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         user: {
           id: user.id,
@@ -107,6 +107,14 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
+    response.cookies.set('token', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/'
+    });
+    return response;
   } catch (error) {
     console.error("Register error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
