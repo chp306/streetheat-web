@@ -6,9 +6,17 @@ import { verifyToken } from '@/lib/jwt'
 export async function POST(req: NextRequest) {
   try {
     const token = req.cookies.get('token')?.value
+    console.log('CHECKOUT DEBUG: token present:', !!token)
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const payload = verifyToken(token)
+    let payload
+    try {
+      payload = verifyToken(token)
+    } catch (e: any) {
+      console.log('CHECKOUT DEBUG: verifyToken error:', e.message)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    console.log('CHECKOUT DEBUG: payload:', JSON.stringify(payload))
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { items } = await req.json()
