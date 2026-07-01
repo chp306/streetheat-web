@@ -11,12 +11,11 @@ export async function middleware(req: NextRequest) {
   }
 
   if (pathname.startsWith("/api/")) {
-    const auth = req.headers.get("authorization");
-    if (!auth?.startsWith("Bearer ")) {
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
       return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
     }
     try {
-      const token = auth.slice(7);
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
       await jwtVerify(token, secret);
       return NextResponse.next();
