@@ -6,15 +6,15 @@ import { verifyToken } from '@/lib/jwt'
 export async function POST(req: NextRequest) {
   try {
     const token = req.cookies.get('token')?.value
-    if (!token) return NextResponse.json({ error: 'Unauthorized', debug: 'no-token', jwtSecretLen: (process.env.JWT_SECRET || '').length }, { status: 401 })
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     let payload
     try {
       payload = verifyToken(token)
-    } catch (e: any) {
-      return NextResponse.json({ error: 'Unauthorized', debug: 'verify-failed', message: e.message, jwtSecretLen: (process.env.JWT_SECRET || '').length, tokenPreview: token.substring(0, 20) }, { status: 401 })
+    } catch {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (!payload) return NextResponse.json({ error: 'Unauthorized', debug: 'null-payload', jwtSecretLen: (process.env.JWT_SECRET || '').length }, { status: 401 })
+    if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { items } = await req.json()
     // items: [{ productId, variantId, quantity }]
