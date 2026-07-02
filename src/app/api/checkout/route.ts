@@ -47,9 +47,17 @@ export async function POST(req: NextRequest) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL}/cart`,
+      payment_intent_data: {
+          statement_descriptor: 'STREETHEAT',
+          metadata: {
+              brand: 'streetheat',
+              userId: payload.userId,
+          },
+      },
       metadata: {
-        userId: payload.userId,
-        items: JSON.stringify(items),
+          brand: 'streetheat',
+          userId: payload.userId,
+          items: JSON.stringify(items),
       },
     })
 
