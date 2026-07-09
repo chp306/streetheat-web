@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import AddToCartButton from "@/components/product/AddToCartButton";
 import OfferButton from "@/components/product/OfferButton";
+import ProductGallery from "@/components/product/ProductGallery";
 
 export const dynamic = "force-dynamic";
 
@@ -25,13 +26,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     <main style={{ backgroundColor: "#0A0A0A", fontFamily: "Inter, sans-serif", minHeight: "100vh" }}>
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="aspect-square bg-zinc-900 border border-zinc-800 flex items-center justify-center overflow-hidden">
-            {mainImage ? (
-              <img src={mainImage} alt={product.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="text-zinc-700 text-xs uppercase tracking-widest">No image</div>
-            )}
-          </div>
+          <ProductGallery images={product.images} name={product.name} />
           <div className="flex flex-col justify-center">
             <p className="text-xs uppercase tracking-[0.3em] mb-2" style={{ color: "#F5A623" }}>
               {product.brand.name}
