@@ -1,32 +1,113 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import ProductCard, { type ProductCardData } from "@/components/product/ProductCard";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+async function getLatestProducts(): Promise<ProductCardData[]> {
+  try {
+    const products = await prisma.product.findMany({
+      where: { status: "published" },
+      include: {
+        brand: true,
+        images: { orderBy: { displayOrder: "asc" }, take: 1 },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+    });
+    return products.map((p) => ({
+      id: p.id,
+      name: p.name,
+      brandName: p.brand.name,
+      price: Number(p.basePrice),
+      imageUrl: p.images[0]?.url ?? null,
+      offerEnabled: p.offerEnabled,
+      condition: p.condition,
+    }));
+  } catch (err) {
+    // Keep the homepage up even if the database is unreachable.
+    console.error("Homepage product query failed", err);
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const products = await getLatestProducts();
+  const heroImage = products.find((p) => p.imageUrl)?.imageUrl ?? null;
+
   return (
     <main style={{ backgroundColor: "#0A0A0A", fontFamily: "Inter, sans-serif" }}>
 
       {/* HERO */}
-      <section className="max-w-6xl mx-auto px-4 py-24 flex flex-col items-center text-center">
-        <p className="text-xs uppercase tracking-[0.3em] mb-6" style={{ color: "#F5A623" }}>
-          Authenticated Sneakers & Streetwear
-        </p>
-        <h1 className="text-5xl md:text-7xl font-normal tracking-[0.15em] text-white mb-6"
-          style={{ fontFamily: "Georgia, serif" }}>
-          STREET<span style={{ color: "#F5A623" }}>HEAT</span>
-        </h1>
-        <p className="text-zinc-400 text-sm max-w-md leading-relaxed mb-10">
-          Premium resale. Every pair authenticated. Make an offer, earn loyalty points, own the heat.
-        </p>
-        <div className="flex gap-4">
+      <section className="relative isolate flex min-h-[80vh] items-end overflow-hidden md:min-h-[88vh]">
+        {heroImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={heroImage}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 -z-20 h-full w-full object-cover opacity-60"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 -z-20"
+            style={{ background: "radial-gradient(ellipse at 70% 30%, rgba(245,166,35,0.18), transparent 60%)" }}
+          />
+        )}
+        <div
+          className="absolute inset-0 -z-10"
+          style={{ background: "linear-gradient(to top, #0A0A0A 8%, rgba(10,10,10,0.55) 45%, rgba(10,10,10,0.25) 100%)" }}
+        />
+
+        <div className="mx-auto w-full max-w-6xl px-4 pb-14 md:pb-20">
+          <p className="mb-4 text-xs font-bold uppercase tracking-[0.35em]" style={{ color: "#F5A623" }}>
+            Authenticated sneakers &amp; streetwear
+          </p>
+          <h1 className="mb-6 text-6xl font-black uppercase leading-[0.9] tracking-tight text-white md:text-8xl lg:text-9xl">
+            Street<span style={{ color: "#F5A623" }}>Heat</span>
+          </h1>
+          <p className="mb-8 max-w-md text-sm leading-relaxed text-zinc-300">
+            Every pair authenticated. UK delivery. Make an offer, earn loyalty points, own the heat.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/products"
+              className="px-10 py-4 text-xs font-bold uppercase tracking-widest transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#F5A623", color: "#0A0A0A" }}>
+              Shop the drop
+            </Link>
+            <Link href="/personal-shopping"
+              className="border border-zinc-600 px-10 py-4 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:border-white">
+              Personal shopping
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* LATEST DROPS */}
+      <section className="max-w-6xl mx-auto px-4 py-16 md:py-20">
+        <div className="mb-8 flex items-end justify-between">
+          <div>
+            <p className="mb-2 text-xs uppercase tracking-[0.3em]" style={{ color: "#F5A623" }}>Just landed</p>
+            <h2 className="text-3xl font-black uppercase tracking-tight text-white md:text-4xl">Latest drops</h2>
+          </div>
           <Link href="/products"
-            className="px-8 py-3 text-xs font-bold uppercase tracking-widest transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "#F5A623", color: "#0A0A0A" }}>
-            Shop Now
-          </Link>
-          <Link href="/personal-shopping"
-            className="px-8 py-3 text-xs font-bold uppercase tracking-widest border border-zinc-700 text-zinc-300 hover:border-zinc-400 transition-colors">
-            Personal Shopping
+            className="text-xs uppercase tracking-widest text-zinc-400 underline-offset-4 transition-colors hover:text-white hover:underline">
+            View all
           </Link>
         </div>
+
+        {products.length === 0 ? (
+          <div className="border border-zinc-800 py-20 text-center">
+            <p className="mb-2 text-sm text-zinc-400">New drops incoming.</p>
+            <p className="text-xs text-zinc-600">Check back soon.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-4 md:gap-x-4">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* DIVIDER */}
